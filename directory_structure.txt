@@ -1,0 +1,255 @@
+Folder PATH listing for volume New Volume
+Volume serial number is 5E86-E7FD
+F:.
+|   .DS_Store
+|   .gitattributes
+|   composer.json
+|   directory_structure.txt
+|   index.html
+|   LICENSE
+|   LICENSE.md
+|   package-lock.json
+|   package.json
+|   README.md
+|   TEMPLATE.html
+|   
++---.vscode
+|       settings.json
+|       
++---assets
+|       0x2w5K5fsqM9M0sxfH.mp4
+|       36uFB6B6Utzsz2d9zC.mp4
+|       about-dec-v2.png
+|       about-dec-v3.png
+|       about-dec.png
+|       about-right-dec.jpg
+|       analytics.png
+|       author-post.jpg
+|       blog-left-dec.jpg
+|       blog-post-01.jpg
+|       blog-post-02.jpg
+|       blog-post-03.jpg
+|       blog-post-04.jpg
+|       bot.png
+|       contact-bottom-right-v2.png
+|       contact-bottom-right-v3.png
+|       contact-bottom-right.png
+|       contact-dec-v2.png
+|       contact-dec-v3.png
+|       contact-dec.png
+|       contact-top-right-v2.png
+|       contact-top-right-v3.png
+|       contact-top-right.png
+|       customer churn prediction.jpeg
+|       data_security.jpg
+|       demo-1.jpg
+|       demo-2.jpg
+|       demo-3.jpg
+|       email-icon.png
+|       fin.jpeg
+|       Financial Forcasting.jpeg
+|       footer-bg-v2.jpg
+|       footer-bg-v3.jpg
+|       footer-bg.jpg
+|       image.png
+|       Inventory Prediction.jpeg
+|       loading.gif
+|       location-icon.png
+|       logo-v1.png
+|       logo-v2.png
+|       logo-v3.png
+|       Marketing Campaign analysis.jpeg
+|       phone-icon.png
+|       portfolio-01.jpg
+|       portfolio-02.jpg
+|       portfolio-03.jpg
+|       portfolio-04.jpg
+|       portfolio-left-dec.jpg
+|       portfolio-right-dec.jpg
+|       quote-bg-v2.jpg
+|       quote-bg-v3.jpg
+|       quote-bg.jpg
+|       sales trend analysis.jpeg
+|       security.png
+|       service-icon-01.png
+|       service-icon-02.png
+|       service-icon-03.png
+|       service-icon-04.png
+|       services-image-02.jpg
+|       services-image-03.jpg
+|       services-image-04.jpg
+|       services-image.jpg
+|       services-left-dec.jpg
+|       services-right-dec.jpg
+|       share (1).png
+|       slider-dec-v2.png
+|       slider-dec-v3.png
+|       slider-dec.png
+|       slider-left-dec.jpg
+|       slider-right-dec.jpg
+|       upload (1).png
+|       upload_large.jpg
+|       upload_wiz.png
+|       visualization-icon.png
+|       visualization.jpg
+|       
++---backend
+|   |   backend.py
+|   |   requirements.txt
+|   |   sampleapi.py
+|   |                 
+|   +---visualization
+|   |       plots.py
+|   |       utils.py
+|   |       visualization.py
+|   |       
+|   \---__pycache__
+|           backend.cpython-311.pyc
+|           sampleapi.cpython-311.pyc
+|           
++---css
+|   |   animated.css
+|   |   bootstrap-social.css
+|   |   bootstrap-theme.min.css
+|   |   bootstrap.min.css
+|   |   bootstrap.min.css.map
+|   |   chat.css
+|   |   font-awesome.min.css
+|   |   fontawesome.css
+|   |   metisMenu.min.css
+|   |   morris.css
+|   |   owl.css
+|   |   startmin.css
+|   |   templatemo-digimedia-v1.css
+|   |   templatemo-digimedia-v2.css
+|   |   templatemo-digimedia-v3.css
+|   |   timeline.css
+|   |   
+|   \---dataTables
+|           dataTables.bootstrap.css
+|           dataTables.responsive.css
+|           
++---fonts
+|       fontawesome-webfont.eot
+|       fontawesome-webfont.svg
+|       fontawesome-webfont.ttf
+|       fontawesome-webfont.woff
+|       fontawesome-webfont.woff2
+|       FontAwesome.otf
+|       glyphicons-halflings-regular.eot
+|       glyphicons-halflings-regular.svg
+|       glyphicons-halflings-regular.ttf
+|       glyphicons-halflings-regular.woff
+|       glyphicons-halflings-regular.woff2
+|       
++---images
+|       8208E758-4C65-44AF-92AC-003995CB8E67_1_201_a.jpeg
+|       carlos-muza-hpjSkU2UYSU-unsplash.jpg
+|       cyber.jpg
+|       Data extraction-pana.png
+|       extraction-pana.jpeg
+|       Files sent-rafiki.png
+|       frequency-wave-7776034_1280.jpg
+|       loading.gif
+|       wipro-white-edited.webp
+|       
++---jquery
+|       jquery.js
+|       jquery.min.js
+|       jquery.min.map
+|       jquery.slim.js
+|       jquery.slim.min.js
+|       jquery.slim.min.map
+|       
++---js
+|   |   .DS_Store
+|   |   animation.js
+|   |   bootstrap.bundle.min.js
+|   |   bootstrap.bundle.min.js.map
+|   |   bootstrap.min.js
+|   |   custom.js
+|   |   flot-data.js
+|   |   imagesloaded.js
+|   |   isotope.js
+|   |   jquery.min.js
+|   |   metisMenu.min.js
+|   |   morris-data.js
+|   |   morris.min.js
+|   |   owl-carousel.js
+|   |   raphael.min.js
+|   |   script.js
+|   |   startmin.js
+|   |   tabs.js
+|   |   uploadwizard.js
+|   |   
+|   +---dataTables
+|   |       dataTables.bootstrap.min.js
+|   |       jquery.dataTables.min.js
+|   |       
+|   \---flot
+|           excanvas.min.js
+|           jquery.colorhelpers.js
+|           jquery.flot.canvas.js
+|           jquery.flot.categories.js
+|           jquery.flot.crosshair.js
+|           jquery.flot.errorbars.js
+|           jquery.flot.fillbetween.js
+|           jquery.flot.image.js
+|           jquery.flot.js
+|           jquery.flot.navigate.js
+|           jquery.flot.pie.js
+|           jquery.flot.resize.js
+|           jquery.flot.selection.js
+|           jquery.flot.stack.js
+|           jquery.flot.symbol.js
+|           jquery.flot.threshold.js
+|           jquery.flot.time.js
+|           jquery.flot.tooltip.min.js
+|           
++---node_modules
+|   |   .package-lock.json
+|   |   
+|   +---cors
+|   |   |   CONTRIBUTING.md
+|   |   |   HISTORY.md
+|   |   |   LICENSE
+|   |   |   package.json
+|   |   |   README.md
+|   |   |   
+|   |   \---lib
+|   |           index.js
+|   |           
+|   +---object-assign
+|   |       index.js
+|   |       license
+|   |       package.json
+|   |       readme.md
+|   |       
+|   \---vary
+|           HISTORY.md
+|           index.js
+|           LICENSE
+|           package.json
+|           README.md
+|           
+\---pages
+        blank.html
+        buttons.html
+        chat.html
+        dataWizard copy.html
+        dataWizard.html
+        docwiz.html
+        flot.html
+        forms.html
+        grid.html
+        home.html
+        homepage.html
+        icons.html
+        index.html
+        login.html
+        morris.html
+        notifications.html
+        panels-wells.html
+        tables.html
+        typography.html
+        
