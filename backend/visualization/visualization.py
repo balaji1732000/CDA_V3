@@ -20,9 +20,78 @@ from plots import (
 )
 
 
+# # Define the directory where processed files are saved
+# processed_files_dir = "F:\Documents backup\AI Projects\CDA_V2\CDA_V2\temp\incidents.csv"
+st.markdown(
+    """
+    <style>
+    #MainMenu, footer, header {visibility: hidden;}
+    .css-18e3th9 {padding: 0 1rem;}
+    .css-1lcbmhc, .css-1d391kg {padding: 0 1rem; max-width: 100% !important;}
+    .main .block-container {padding: 0 1rem; max-width: 100%;}
 
-# Define the directory where processed files are saved
-processed_files_dir = "F:\Documents backup\AI Projects\CDA_V2\CDA_V2\temp\incidents.csv"
+    /* Change the background color */
+    body {
+        background-color: #f0f8ff; /* AliceBlue background color */
+    }
+    .main .block-container {
+        background-color: #ffffff; /* White background for the container */
+        border-radius: 10px;
+        padding: 2rem;
+    }
+
+    .stTabs [data-baseweb="tab"]:hover {
+       background-color: #f0f0f0; 
+       color: #000; 
+    }
+    .stTabs [data-baseweb="tab"][aria-selected="true"]{
+        background-color: #fff; 
+        color: #000; 
+        border-bottom: 2px solid #ff4b4b;
+    }
+    .css-1d391kg {font-family: 'Arial', sans-serif; font-size: 1rem;}
+
+    /* Change the button colors */
+    .stButton>button {
+        background-color: #304666; /* Button background color (Green) */
+        color: #fff; /* Button text color */
+        border: none;
+        border-radius: 5px;
+        padding: 0.5rem 1rem;
+        font-size: 1rem;
+    }
+    .stButton>button:hover {
+        background-color: #fffff; /* Button hover color */
+    }
+
+    /* Change the select box styles */
+    .stSelectbox>div>div>div {
+        padding: 0.5rem;
+        background-color: #fff; /* Light cyan background color for select box */
+    }
+    .css-1hb8ztp {
+        font-size: 1rem;
+        color: #333;
+    }
+    .css-10trblm {
+        padding: 0.5rem;
+    }
+    </style>
+    """,
+    unsafe_allow_html=True,
+)
+
+
+# Helper function to get command-line arguments
+def get_command_line_args():
+    import argparse
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "--dataVizFile", type=str, required=True, help="Path to the data file"
+    )
+    args = parser.parse_args()
+    return args
 
 
 def display_word_cloud(text):
@@ -35,18 +104,6 @@ def display_word_cloud(text):
             st.pyplot(word_cloud_plot(text))
 
 
-def get_command_line_args():
-    """Helper function to get command-line arguments"""
-    import argparse
-
-    parser = argparse.ArgumentParser()
-    parser.add_argument(
-        "--dataVizFile", type=str, required=True, help="Path to the data file"
-    )
-    args = parser.parse_args()
-    return args
-
-
 def data_visualization(DF):
     st.divider()
     st.subheader("Data Visualization")
@@ -54,11 +111,12 @@ def data_visualization(DF):
     # Three tabs for three kinds of visualization
     single_tab, multiple_tab, advanced_tab = st.tabs(
         [
-            "Single Attribute Visualization",
-            "Multiple Attributes Visualization",
+            "Single Data Visualization",
+            "Combined Data Visualization",
             "Advanced Visualization",
         ]
     )
+
     # Single attribute visualization
     with single_tab:
         _, col_mid, _ = st.columns([1, 5, 1])
@@ -265,36 +323,50 @@ def data_visualization(DF):
 
 
 # Read the latest processed file
-def get_latest_processed_file():
-    files = os.listdir(processed_files_dir)
-    if not files:
-        st.error("No processed files found.")
-        return None
-    latest_file = max(
-        files, key=lambda x: os.path.getctime(os.path.join(processed_files_dir, x))
-    )
-    file_path = os.path.join(processed_files_dir, latest_file)
-    return file_path
+# def get_latest_processed_file():
+#     files = os.listdir(processed_files_dir)
+#     if not files:
+#         st.error("No processed files found.")
+#         return None
+#     latest_file = max(
+#         files, key=lambda x: os.path.getctime(os.path.join(processed_files_dir, x))
+#     )
+#     file_path = os.path.join(processed_files_dir, latest_file)
+#     return file_path
 
 
 # Main function to load the data and call the visualization function
 def main():
+
     args = get_command_line_args()
     dataVizFile = args.dataVizFile
+
+    # st.write(f"Received file path: {dataVizFile}")  # Debugging statement
 
     if not dataVizFile:
         st.error("No data file provided.")
         return
 
-    file_extension = os.path.splitext(dataVizFile)[-1].lower()
-    if file_extension == ".csv":
-        df = pd.read_csv(dataVizFile)
-    elif file_extension == ".xlsx":
-        df = pd.read_excel(dataVizFile)
-    else:
-        st.error("Unsupported file format")
+    if not os.path.exists(dataVizFile):
+        st.error(f"File does not exist: {dataVizFile}")
         return
 
+    file_extension = os.path.splitext(dataVizFile)[-1].lower()
+    # st.write(f"File extension: {file_extension}")  # Debugging statement
+
+    try:
+        if file_extension == ".csv":
+            df = pd.read_csv(dataVizFile)
+        elif file_extension == ".xlsx":
+            df = pd.read_excel(dataVizFile)
+        else:
+            st.error("Unsupported file format")
+            return
+    except Exception as e:
+        st.error(f"Error reading file: {e}")
+        return
+
+    # st.write("File loaded successfully!")  # Debugging statement
     data_visualization(df)
 
 

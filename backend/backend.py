@@ -14,7 +14,7 @@ from sqlalchemy.dialects.mysql import VARCHAR
 import chardet
 import numpy as np
 from pydantic import BaseModel
-
+import platform
 import subprocess
 
 # Set up logging configuration
@@ -48,11 +48,38 @@ class CreateDBRequest(BaseModel):
     db_name: str
 
 
+import subprocess
+import logging
+import threading
+
+
+import os
+import subprocess
+import logging
+import threading
+import platform
+
+
 def start_streamlit_app(data_viz_file):
-    # Define the command to run the Streamlit app with the data file as an argument
-    command = f"streamlit run visualization.py -- --dataVizFile {data_viz_file}"
-    # Start the Streamlit app using subprocess
-    subprocess.Popen(command, shell=True)
+    # Ensure the correct path to the visualization.py script
+    script_path = os.path.abspath(os.path.join("visualization", "visualization.py"))
+    command = f'streamlit run "{script_path}" -- --dataVizFile "{data_viz_file}"'
+    logging.debug(f"Streamlit command: {command}")
+
+    def run_streamlit():
+        try:
+            env = os.environ.copy()
+            env["BROWSER"] = "none"
+            env["STREAMLIT_BROWSER_GAP"] = "-1"
+            env["STREAMLIT_SERVER_HEADLESS"] = "true"
+            subprocess.Popen(command, shell=True, env=env)
+            logging.debug("Streamlit app started successfully.")
+        except Exception as e:
+            logging.error(f"Failed to start Streamlit app: {e}")
+
+    thread = threading.Thread(target=run_streamlit)
+    thread.start()
+    logging.debug("Streamlit app started in a new thread.")
 
 
 @app.post("/create_db")
