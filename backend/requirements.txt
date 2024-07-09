@@ -16,4 +16,5 @@ pandas
 sqlalchemy
 chardet
 numpy
+streamlit_extras
 pydantic

@@ -43,6 +43,9 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# Global variable to store Streamlit URL
+streamlit_url = None
+
 
 class CreateDBRequest(BaseModel):
     db_name: str
@@ -63,7 +66,7 @@ import platform
 def start_streamlit_app(data_viz_file):
     # Ensure the correct path to the visualization.py script
     script_path = os.path.abspath(os.path.join("visualization", "visualization.py"))
-    command = f'streamlit run "{script_path}" -- --dataVizFile "{data_viz_file}"'
+    command = f'streamlit run "{script_path}" -- --dataVizFile "{data_viz_file}" '
     logging.debug(f"Streamlit command: {command}")
 
     def run_streamlit():
@@ -74,6 +77,7 @@ def start_streamlit_app(data_viz_file):
             env["STREAMLIT_SERVER_HEADLESS"] = "true"
             subprocess.Popen(command, shell=True, env=env)
             logging.debug("Streamlit app started successfully.")
+            streamlit_url = "http://localhost:8501"
         except Exception as e:
             logging.error(f"Failed to start Streamlit app: {e}")
 
@@ -118,6 +122,7 @@ async def upload_file_info(files: List[UploadFile] = File(...)):
     global uploaded_files_info
     global file_names
     global dataVizFile
+    global streamlit_url
     uploaded_files_info = []
     file_infos = []
     file_names = []
@@ -176,12 +181,18 @@ async def upload_file_info(files: List[UploadFile] = File(...)):
 
     # Start the Streamlit app with the data file
     start_streamlit_app(dataVizFile)
+    print(
+        "------------------------------------",
+        streamlit_url,
+        "--------------------------------------------------------",
+    )
 
     return {
         "file_info": file_infos,
         "saved_files": uploaded_files_info,
         "file_names": file_names,
         "dataVizFile": dataVizFile,
+        "streamlit_url": streamlit_url,
     }
 
 
