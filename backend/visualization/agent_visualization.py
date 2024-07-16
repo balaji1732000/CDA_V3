@@ -1,9 +1,11 @@
 import streamlit as st
 import pandas as pd
 import os
+import re
+import json
 from local_components import card_container
 from utils import developer_info_static
-from plots1 import (
+from plots import (
     list_all,
     distribution_histogram,
     distribution_boxplot,
@@ -20,11 +22,12 @@ from plots1 import (
     scatter_3d,
     bar_chart,
     pie_chart,
-    # radar_chart,
     scatter_matrix,
 )
 import pandas.api.types as ptypes
 from pygwalker.api.streamlit import StreamlitRenderer
+
+from ai_visual_agent import ai_visual_agent
 
 
 # Function to identify unique ID columns
@@ -35,9 +38,6 @@ def is_unique_id(df, column, threshold=0.9):
 def init_session_state():
     if "selected_functionality" not in st.session_state:
         st.session_state["selected_functionality"] = None
-
-
-#   .MainMenu, footer, header, .css-1oe5cao, .css-1v3fvcr, .css-1n543e5 {visibility: hidden;}
 
 
 st.markdown(
@@ -146,9 +146,65 @@ def display_word_cloud(text):
             st.pyplot(word_fig)
 
 
-def data_visualization(DF):
+def load_visualization_recommendations(file_path="visualization_recommendations.txt"):
+    with open(file_path, "r") as file:
+        file_content = file.read()
+
+    json_match = re.search(r"```json(.*?)```", file_content, re.DOTALL)
+    if json_match:
+        json_content = json_match.group(1).strip()
+        print("JSON content extracted successfully.")
+    else:
+        print("No JSON content found.")
+        return None
+
+    try:
+        recommendations = json.loads(json_content)
+
+        print("JSON content parsed successfully.")
+        print(
+            f"Recommendations structure: {json.dumps(recommendations, indent=4)}"
+        )  # Debug print
+        return recommendations
+    except json.JSONDecodeError as e:
+        print(f"Error parsing JSON content: {e}")
+        return None
+
+
+def get_default_recommendation(recommendations, attribute_type, chart_type):
+    try:
+        if attribute_type in recommendations:
+            if chart_type in recommendations[attribute_type]:
+                attributes = recommendations[attribute_type][chart_type].get(
+                    "Attributes", []
+                )
+                if attributes and isinstance(attributes, list):
+                    return attributes
+                else:
+                    st.error(
+                        f"Attributes for {chart_type} in {attribute_type} is not a list or is empty."
+                    )
+            else:
+                st.error(f"Chart type {chart_type} not found in {attribute_type}.")
+        else:
+            st.error(f"Attribute type {attribute_type} not found in recommendations.")
+    except Exception as e:
+        st.error(
+            f"Error fetching default recommendation for {attribute_type} - {chart_type}: {e}"
+        )
+        print(f"Recommendations structure: {json.dumps(recommendations, indent=4)}")
+    return []
+
+
+def data_visualization(DF, recommendations):
     attributes = DF.columns.tolist()
     non_unique_id_attributes = [col for col in attributes if not is_unique_id(DF, col)]
+
+    def safe_default_index(options, default):
+        if default in options:
+            return options.index(default)
+        return 0
+
     # Title for the dashboard
     st.markdown(
         """<div class="title">AI ANALYTICS DASHBOARD</div>""", unsafe_allow_html=True
@@ -170,20 +226,27 @@ def data_visualization(DF):
             '<div class="black-subheader"><h4>Categorical Attribute Visualization</h4></div>',
             unsafe_allow_html=True,
         )
-        default_categorical_attribute = next(
-            (col for col in non_unique_id_attributes if is_categorical(col, DF)),
-            non_unique_id_attributes[0],
+        default_categorical_attribute = (
+            get_default_recommendation(
+                recommendations, "Categorical Attribute", "Pie Chart"
+            )[0]
+            if get_default_recommendation(
+                recommendations, "Categorical Attribute", "Pie Chart"
+            )
+            else (
+                non_unique_id_attributes[0]
+                if non_unique_id_attributes
+                else attributes[0]
+            )
         )
+        categorical_options = [col for col in attributes if is_categorical(col, DF)]
         categorical_attribute = st.selectbox(
             label="Select a categorical attribute to visualize:",
-            options=[col for col in attributes if is_categorical(col, DF)],
-            index=(
-                0
-                if not default_categorical_attribute
-                else attributes.index(default_categorical_attribute)
+            options=categorical_options,
+            index=safe_default_index(
+                categorical_options, default_categorical_attribute
             ),
         )
-
         st.write(f"Categorical Attribute selected: :green[{categorical_attribute}]")
         categorical_plot_types = ["Donut Chart", "Bar Chart", "Pie Chart"]
         categorical_plot_type = st.selectbox(
@@ -209,23 +272,28 @@ def data_visualization(DF):
             except Exception as e:
                 st.error(f"Error generating plot: {e}")
     with col_numerical:
-
         st.markdown(
             '<div class="black-subheader"><h4>Numerical Attribute Visualization</h4></div>',
             unsafe_allow_html=True,
         )
-        default_numerical_attribute = next(
-            (col for col in non_unique_id_attributes if is_numeric(col, DF)),
-            non_unique_id_attributes[0],
+        default_numerical_attribute = (
+            get_default_recommendation(
+                recommendations, "Numerical Attribute", "Box Plot"
+            )[0]
+            if get_default_recommendation(
+                recommendations, "Numerical Attribute", "Box Plot"
+            )
+            else (
+                non_unique_id_attributes[0]
+                if non_unique_id_attributes
+                else attributes[0]
+            )
         )
+        numerical_options = [col for col in attributes if is_numeric(col, DF)]
         numerical_attribute = st.selectbox(
             label="Select a numerical attribute to visualize:",
-            options=[col for col in attributes if is_numeric(col, DF)],
-            index=(
-                0
-                if not default_numerical_attribute
-                else attributes.index(default_numerical_attribute)
-            ),
+            options=numerical_options,
+            index=safe_default_index(numerical_options, default_numerical_attribute),
         )
         st.write(f"Numerical Attribute selected: :green[{numerical_attribute}]")
         numerical_plot_types = [
@@ -262,7 +330,6 @@ def data_visualization(DF):
 
     st.divider()
 
-    # Multiple attribute visualization
     st.markdown(
         '<div class="black-subheader"><h3>Multiple Attribute Visualization</h3></div>',
         unsafe_allow_html=True,
@@ -270,9 +337,10 @@ def data_visualization(DF):
 
     col1, col2 = st.columns([6, 4])
     with col1:
-        default_attributes = [
-            col for col in non_unique_id_attributes if is_numeric(col, DF)
-        ][:3]
+        default_attributes = (
+            get_default_recommendation(recommendations, "Multiple Attribute", "Heatmap")
+            or [col for col in non_unique_id_attributes if is_numeric(col, DF)][:3]
+        )
         options = st.multiselect(
             label="Select multiple attributes to visualize:",
             options=attributes,
@@ -357,42 +425,44 @@ def data_visualization(DF):
         unsafe_allow_html=True,
     )
     column_1, column_2, column_3 = st.columns(3)
-    default_x = (
-        default_attributes[0] if default_attributes else non_unique_id_attributes[0]
-    )
-    default_y = (
-        default_attributes[1]
-        if len(default_attributes) > 1
-        else non_unique_id_attributes[1]
-    )
-    default_z = next(
+    default_x, default_y, default_z = get_default_recommendation(
+        recommendations, "3D Plot", "3D Plot"
+    ) or [
+        (default_attributes[0] if default_attributes else non_unique_id_attributes[0]),
         (
-            col
-            for col in non_unique_id_attributes
-            if is_numeric(col, DF) and col not in default_attributes
+            default_attributes[1]
+            if len(default_attributes) > 1
+            else non_unique_id_attributes[1]
         ),
-        non_unique_id_attributes[2] if len(non_unique_id_attributes) > 2 else None,
-    )
+        next(
+            (
+                col
+                for col in non_unique_id_attributes
+                if is_numeric(col, DF) and col not in default_attributes
+            ),
+            non_unique_id_attributes[2] if len(non_unique_id_attributes) > 2 else None,
+        ),
+    ]
     with column_1:
         x = st.selectbox(
             key="x",
             label="Select the x attribute:",
             options=attributes,
-            index=attributes.index(default_x),
+            index=safe_default_index(attributes, default_x),
         )
     with column_2:
         y = st.selectbox(
             key="y",
             label="Select the y attribute:",
             options=attributes,
-            index=attributes.index(default_y),
+            index=safe_default_index(attributes, default_y),
         )
     with column_3:
         z = st.selectbox(
             key="z",
             label="Select the z attribute:",
             options=attributes,
-            index=attributes.index(default_z) if default_z else 0,
+            index=safe_default_index(attributes, default_z) if default_z else 0,
         )
     plot_3d_area = st.empty()  # Create an empty area for the 3D plot
     # Default 3D scatter plot
@@ -416,8 +486,17 @@ def data_visualization(DF):
         unsafe_allow_html=True,
     )
 
+    text_attr = (
+        get_default_recommendation(recommendations, "Word Cloud", "Word Cloud")[0]
+        if get_default_recommendation(recommendations, "Word Cloud", "Word Cloud")
+        else (
+            non_unique_id_attributes[0] if non_unique_id_attributes else attributes[0]
+        )
+    )
     text_attr = st.selectbox(
-        label="Select the text attribute:", options=attributes, index=0
+        label="Select the text attribute:",
+        options=attributes,
+        index=safe_default_index(attributes, text_attr),
     )
     if st.button("Generate Word Cloud"):
         text = DF[text_attr].astype(str).str.cat(sep=" ")
@@ -470,7 +549,7 @@ def data_visualization(DF):
 
 
 def main():
-    dataVizFile = "incidents.csv"
+    dataVizFile = "cars.csv"
     if not dataVizFile:
         st.error("No data file provided.")
         return
@@ -492,7 +571,15 @@ def main():
         st.error(f"Error reading file: {e}")
         return
 
-    data_visualization(df)
+    # Generate visualization recommendations
+    ai_visual_agent(dataVizFile)
+    recommendations = load_visualization_recommendations()
+
+    # Check if recommendations were successfully loaded
+    if recommendations:
+        data_visualization(df, recommendations)
+    else:
+        st.error("Failed to load visualization recommendations.")
 
 
 if __name__ == "__main__":

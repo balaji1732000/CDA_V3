@@ -42,12 +42,13 @@ def distribution_histogram(df, attribute):
     return fig
 
 
-def bar_chart(df, attribute):
+def bar_chart(df, attribute, top_n=20):
     """
     Interactive bar chart of the distribution of a single attribute using Plotly.
+    Limits the visualization to the top 'top_n' categories.
     """
     if attribute in df.columns:
-        value_counts = df[attribute].value_counts()
+        value_counts = df[attribute].value_counts().nlargest(top_n)
         fig = px.bar(
             x=value_counts.index,
             y=value_counts.values,
@@ -84,12 +85,13 @@ def distribution_boxplot(df, attribute):
     return fig
 
 
-def count_Y(df, Y_name):
+def count_Y(df, Y_name, top_n=20):
     """
     Interactive donut chart of the distribution of a single attribute using Plotly.
+    Limits the visualization to the top 'top_n' categories.
     """
     if Y_name in df.columns and df[Y_name].nunique() >= 1:
-        value_counts = df[Y_name].value_counts()
+        value_counts = df[Y_name].value_counts().nlargest(top_n)
         fig = px.pie(
             names=value_counts.index,
             values=value_counts.values,
@@ -135,12 +137,13 @@ def density_plot(df, column_name):
         return fig
 
 
-def pie_chart(df, attribute):
+def pie_chart(df, attribute, top_n=20):
     """
     Interactive pie chart of the distribution of a single attribute using Plotly.
+    Limits the visualization to the top 'top_n' categories.
     """
     if attribute in df.columns:
-        value_counts = df[attribute].value_counts()
+        value_counts = df[attribute].value_counts().nlargest(top_n)
         fig = px.pie(
             names=value_counts.index,
             values=value_counts.values,
@@ -842,7 +845,7 @@ def lag_plot(df, value_column, lag=1):
 
 def pair_plot(df, attributes):
     """
-    Interactive pair plot to visualize relationships between pairs of variables using Seaborn and Plotly. 
+    Interactive pair plot to visualize relationships between pairs of variables using Seaborn and Plotly.
     """
     # Check if attributes exist and are numeric
     valid_attributes = [
